@@ -13,7 +13,7 @@
 
 
     <groupId>com.me.learning.customer</groupId>
-    <artifactId>customer-servive</artifactId>
+    <artifactId>customer-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>customer-service</name>
     <description>customer-service</description>
