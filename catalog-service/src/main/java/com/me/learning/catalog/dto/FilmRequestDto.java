@@ -5,11 +5,15 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.me.learning.catalog.service.validation.ValidActorIds;
+import com.me.learning.catalog.service.validation.ValidCategoryIds;
+import com.me.learning.catalog.service.validation.ValidInlineActorsAndCategories;
 
 /**
  * Write-model DTO for {@link com.me.learning.catalog.entity.Film}.
@@ -37,10 +41,9 @@ public record FilmRequestDto(
         @Size (max = 5) String rating,
         String specialFeatures,
         Instant lastUpdate,
-        List<Integer> actorIds,
-        List<Short> categoryIds,
-        List<ActorRequestDto> inlineActors,
-        List<CategoryRequestDto> inlineCategories
+        @ValidActorIds List<Integer> actorIds,
+        @ValidCategoryIds List<Short> categoryIds,
+        @Valid @ValidInlineActorsAndCategories List<ActorRequestDto> inlineActors,
+        @Valid @ValidInlineActorsAndCategories List<CategoryRequestDto> inlineCategories
 ) implements Serializable {
 }
-
