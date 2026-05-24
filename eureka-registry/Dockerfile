@@ -7,9 +7,8 @@ WORKDIR /workspace
 # Copy the whole monorepo so parent and framework modules are resolvable during build.
 COPY . .
 
-# Build only eureka-registry; -am builds upstream modules (parent, framework) if needed.
-# Skip tests to speed up image build (tests run in CI, not at Docker build time).
-RUN mvn -f eureka-registry/pom.xml -pl eureka-registry -am -DskipTests clean package
+# Build only eureka-registry from the root reactor; -am builds upstream modules as needed.
+RUN mvn -f pom.xml -pl eureka-registry -am -DskipTests clean package
 
 # ─── Stage 2: Runtime ─────────────────────────────────────────────────────────
 # Use a minimal JRE-only image for the final container (no build tool, smaller image).
@@ -37,4 +36,3 @@ EXPOSE 8761
 
 # Launch the Spring Boot application.
 ENTRYPOINT ["java", "-jar", "app.jar"]
-

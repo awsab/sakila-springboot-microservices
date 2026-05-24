@@ -31,10 +31,11 @@ import com.me.learning.catalog.repository.ActorRepository;
 @RequiredArgsConstructor
 public class ValidActorIdsValidator implements ConstraintValidator<ValidActorIds, List<Integer>> {
 
+    private static final int MAX_ACTORS_IDS_LIMIT = 5;
     private final ActorRepository actorRepository;
 
     @Override
-    public void initialize(ValidActorIds constraintAnnotation) {
+    public void initialize(ValidActorIds validActorIds) {
         // No initialization needed
     }
 
@@ -82,10 +83,10 @@ public class ValidActorIdsValidator implements ConstraintValidator<ValidActorIds
 
     private void addViolation(ConstraintValidatorContext context, Set<Integer> missingIds, String prefix) {
         String missingIdsText = missingIds.stream()
-                .limit(5)
+                .limit(MAX_ACTORS_IDS_LIMIT)
                 .map(String::valueOf)
                 .collect(Collectors.joining(", "));
-        if (missingIds.size() > 5) {
+        if (missingIds.size() > MAX_ACTORS_IDS_LIMIT) {
             missingIdsText += ", ...";
         }
         context.disableDefaultConstraintViolation();

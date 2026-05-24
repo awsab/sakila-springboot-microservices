@@ -78,7 +78,7 @@ services:
       - eureka-registry
     ports:
       # Publish 8081; context-path is /customer-identity/api.
-      - "8081:8081"
+      - "8092:8092"
     environment:
       # Override only: Eureka endpoint must use compose container DNS name.
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-registry:8761/eureka/
@@ -99,7 +99,7 @@ services:
       - eureka-registry
     ports:
       # Publish 8082; context-path is /rental/api.
-      - "8082:8082"
+      - "8093:8093"
     environment:
       # Override only: compose-network-specific Eureka endpoint.
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-registry:8761/eureka/
@@ -119,27 +119,11 @@ services:
       - eureka-registry
     ports:
       # Publish 8083 (no port configured in inventory application.yaml; Dockerfile sets 8083).
-      - "8083:8083"
+      - "8094:8094"
     environment:
       # Override only: Eureka endpoint via container DNS.
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-registry:8761/eureka/
       EUREKA_INSTANCE_HOSTNAME: inventory-service
-    restart: unless-stopped
-    networks:
-      - sakila-net
-
-  # Standalone Spring Security demo — not registered with Eureka.
-  seucurity1:
-    build:
-      # seucurity1 uses its own spring-boot-starter-parent, no shared parent needed.
-      context: .
-      dockerfile: seucurity1/Dockerfile
-    image: sakila/seucurity1:local
-    container_name: seucurity1
-    ports:
-      # Publish 8084 (avoids clash with customer-service on 8081).
-      - "8084:8084"
-    # No environment overrides needed — SERVER_PORT=8084 already set in seucurity1/Dockerfile.
     restart: unless-stopped
     networks:
       - sakila-net

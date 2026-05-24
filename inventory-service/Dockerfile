@@ -7,8 +7,8 @@ WORKDIR /workspace
 # Full monorepo copy required for shared parent/framework resolution.
 COPY . .
 
-# Build inventory-service; -am builds parent + framework first.
-RUN mvn -f inventory-service/pom.xml -pl inventory-service -am -DskipTests clean package
+# Build only inventory-service from the root reactor; -am builds upstream modules as needed.
+RUN mvn -f pom.xml -pl inventory-service -am -DskipTests clean package
 
 # ─── Stage 2: Runtime ─────────────────────────────────────────────────────────
 # Slim JRE runtime image.
@@ -31,4 +31,3 @@ ENV EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://localhost:8761/eureka/
 EXPOSE 8083
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
-

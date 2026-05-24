@@ -37,23 +37,19 @@
           <entry name="$MAVEN_REPOSITORY$/net/bytebuddy/byte-buddy/1.17.8/byte-buddy-1.17.8.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/jboss/logging/jboss-logging/3.6.3.Final/jboss-logging-3.6.3.Final.jar" />
         </processorPath>
-        <module name="customer-servive" />
         <module name="sakila-framework" />
         <module name="eureka-registry" />
         <module name="rental-service" />
         <module name="inventory-service" />
+        <module name="customer-service" />
         <module name="catalog-service" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="customer-service" target="25" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="catalog-service" options="-parameters -parameters" />
       <module name="customer-service" options="-parameters -parameters" />
-      <module name="customer-servive" options="-parameters -parameters" />
       <module name="eureka-registry" options="-parameters -parameters" />
       <module name="inventory-service" options="-parameters -parameters" />
       <module name="rental-service" options="-parameters -parameters" />

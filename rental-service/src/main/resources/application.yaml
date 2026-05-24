@@ -53,20 +53,21 @@ spring:
   jackson:
     time-zone: UTC
     default-property-inclusion: non_null
+  web:
+    error:
+      include-message: always
+      include-binding-errors: always
+      include-stacktrace: never
 
 # ── Server ────────────────────────────────────────────────────
 server:
-  port: 8082
+  port: 8093
   servlet:
     context-path: /rental/api
   compression:
     enabled: true
     mime-types: application/json,application/xml,text/html,text/plain
     min-response-size: 2048
-  error:
-    include-message: always        # expose message in error response
-    include-binding-errors: always
-    include-stacktrace: never      # never leak stack traces to clients
 
 # ── SpringDoc / Swagger UI ────────────────────────────────────
 springdoc:
@@ -100,6 +101,20 @@ logging:
       %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level
       [%X{traceId:-0},%X{spanId:-0}] %logger{40} - %msg%n
 
+
+eureka:
+  client:
+    allow-redirects: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    metadata-map:
+      instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
 ---
 # ============================================================
 #  Profile: sit  (default — full tests + coverage gate)

@@ -1,0 +1,76 @@
+version: "3.9"
+
+name: sakila-local-pod
+
+services:
+  eureka-registry:
+    image: sakila/eureka-registry:local
+    container_name: eureka-registry
+    ports:
+      - "8761:8761"
+    environment:
+      EUREKA_INSTANCE_HOSTNAME: eureka-registry
+    restart: unless-stopped
+    networks:
+      - sakila-net
+
+  catalog-service:
+    image: sakila/catalog-service:local
+    container_name: catalog-service
+    depends_on:
+      - eureka-registry
+    ports:
+      - "8091:8091"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-registry:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: catalog-service
+    restart: unless-stopped
+    networks:
+      - sakila-net
+
+  customer-service:
+    image: sakila/customer-service:local
+    container_name: customer-service
+    depends_on:
+      - eureka-registry
+    ports:
+      - "8092:8092"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-registry:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: customer-service
+    restart: unless-stopped
+    networks:
+      - sakila-net
+
+  rental-service:
+    image: sakila/rental-service:local
+    container_name: rental-service
+    depends_on:
+      - eureka-registry
+    ports:
+      - "8093:8093"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-registry:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: rental-service
+    restart: unless-stopped
+    networks:
+      - sakila-net
+
+  inventory-service:
+    image: sakila/inventory-service:local
+    container_name: inventory-service
+    depends_on:
+      - eureka-registry
+    ports:
+      - "8094:8094"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-registry:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: inventory-service
+    restart: unless-stopped
+    networks:
+      - sakila-net
+
+networks:
+  sakila-net:
+    driver: bridge
+

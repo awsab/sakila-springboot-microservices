@@ -31,6 +31,7 @@ import com.me.learning.catalog.repository.CategoryRepository;
 @RequiredArgsConstructor
 public class ValidCategoryIdsValidator implements ConstraintValidator<ValidCategoryIds, List<Short>> {
 
+    private static final int MAX_CATEGORY_ID_LIMIT = 5;
     private final CategoryRepository categoryRepository;
 
     @Override
@@ -82,10 +83,10 @@ public class ValidCategoryIdsValidator implements ConstraintValidator<ValidCateg
 
     private void addViolation(ConstraintValidatorContext context, Set<Short> missingIds) {
         String missingIdsText = missingIds.stream()
-                .limit(5)
+                .limit(MAX_CATEGORY_ID_LIMIT)
                 .map(String::valueOf)
                 .collect(Collectors.joining(", "));
-        if (missingIds.size() > 5) {
+        if (missingIds.size() > MAX_CATEGORY_ID_LIMIT) {
             missingIdsText += ", ...";
         }
         context.disableDefaultConstraintViolation();

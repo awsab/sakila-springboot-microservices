@@ -7,8 +7,8 @@ WORKDIR /workspace
 # Copy complete monorepo so parent/framework modules build correctly.
 COPY . .
 
-# Build rental-service only; -am ensures upstream modules are built first.
-RUN mvn -f rental-service/pom.xml -pl rental-service -am -DskipTests clean package
+# Build only rental-service from the root reactor; -am builds upstream modules as needed.
+RUN mvn -f pom.xml -pl rental-service -am -DskipTests clean package
 
 # ─── Stage 2: Runtime ─────────────────────────────────────────────────────────
 # JRE-only runtime to keep the image small and secure (no JDK tools exposed).
@@ -31,4 +31,3 @@ ENV EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://localhost:8761/eureka/
 EXPOSE 8082
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
-

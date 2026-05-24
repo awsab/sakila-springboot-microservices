@@ -7,9 +7,8 @@ WORKDIR /workspace
 # Full repo copy needed because customer-service inherits sakila-parent / sakila-framework.
 COPY . .
 
-# Build customer-service; -am ensures parent and framework are installed first.
-# Skip tests during image build — tests should run in CI pipelines, not here.
-RUN mvn -f customer-service/pom.xml -pl customer-service -am -DskipTests clean package
+# Build only customer-service from the root reactor; -am builds upstream modules as needed.
+RUN mvn -f pom.xml -pl customer-service -am -DskipTests clean package
 
 # ─── Stage 2: Runtime ─────────────────────────────────────────────────────────
 # Minimal JRE image — no Maven, no JDK, just what's needed to run the jar.
@@ -32,4 +31,3 @@ ENV EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://localhost:8761/eureka/
 EXPOSE 8081
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
-

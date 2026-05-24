@@ -7,9 +7,8 @@ WORKDIR /workspace
 # Copy whole monorepo so sakila-parent and sakila-framework are available locally.
 COPY . .
 
-# Build only catalog-service; -am resolves and builds upstream dependencies.
-# -DskipTests keeps image builds fast; run tests separately in CI.
-RUN mvn -f catalog-service/pom.xml -pl catalog-service -am -DskipTests clean package
+# Build only catalog-service from the root reactor; -am builds upstream modules as needed.
+RUN mvn -f pom.xml -pl catalog-service -am -DskipTests clean package
 
 # ─── Stage 2: Runtime ─────────────────────────────────────────────────────────
 # Lean JRE-only base image — no Maven or JDK tools in the final container.
@@ -33,4 +32,3 @@ ENV EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://localhost:8761/eureka/
 EXPOSE 8091
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
-
