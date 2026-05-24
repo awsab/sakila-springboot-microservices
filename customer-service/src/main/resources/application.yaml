@@ -7,6 +7,9 @@ spring:
   application:
     name: customer-service
 
+  flyway:
+    enabled: false
+
   # ── Profiles ───────────────────────────────────────────────
   profiles:
     active: sit          # overridden by Maven profile: -P UAT / -P PROD
@@ -188,6 +191,9 @@ spring:
     hibernate:
       ddl-auto: validate           # schema managed by Flyway/Liquibase in PROD
     show-sql: false
+
+  flyway:
+    enabled: true
 
 logging:
   level:
