@@ -1,0 +1,26 @@
+# Build outputs
+**/target/
+**/build/
+**/out/
+
+# Logs
+**/*.log
+**/logs/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+
+# Maven
+**/.mvn/timing.properties
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local environment / secrets
+.env
+.env.*
+*.local
+

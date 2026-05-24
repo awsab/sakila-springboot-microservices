@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RentalServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">rental-service</a> &gt; <a href="index.source.html" class="el_package">com.me.learning.rental.service</a> &gt; <span class="el_source">RentalServiceImpl.java</span></div><h1>RentalServiceImpl.java</h1><pre class="source lang-java linenums">package com.me.learning.rental.service;
+
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import com.me.learning.framework.web.errors.BadRequestException;
+import com.me.learning.framework.web.errors.ResourceNotFoundException;
+import com.me.learning.rental.dto.PaymentRequestDto;
+import com.me.learning.rental.dto.RentalCheckoutRequestDto;
+import com.me.learning.rental.dto.RentalCheckoutResponseDto;
+import com.me.learning.rental.dto.RentalRequestDto;
+import com.me.learning.rental.dto.RentalResponseDto;
+import com.me.learning.rental.entity.Payment;
+import com.me.learning.rental.entity.Rental;
+import com.me.learning.rental.mapper.PaymentMapper;
+import com.me.learning.rental.mapper.RentalMapper;
+import com.me.learning.rental.repository.PaymentRepository;
+import com.me.learning.rental.repository.RentalRepository;
+
+/**
+ * Default implementation of {@link RentalService}.
+ *
+ * &lt;h3&gt;Transaction strategy&lt;/h3&gt;
+ * &lt;ul&gt;
+ *   &lt;li&gt;Class-level {@code @Transactional(readOnly = true)} covers all read paths.&lt;/li&gt;
+ *   &lt;li&gt;Write methods override with {@code @Transactional} (read-write).&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;h3&gt;No FK resolution required&lt;/h3&gt;
+ * {@link Rental} holds all cross-service references as plain ID columns
+ * ({@code inventoryId}, {@code customerId}, {@code staffId}) — there are no
+ * intra-service {@code @ManyToOne} associations to resolve, so no secondary
+ * repository lookup is needed on create or update.
+ */
+<span class="fc" id="L43">@Slf4j</span>
+@Service
+@RequiredArgsConstructor
+@Transactional (readOnly = true)
+public class RentalServiceImpl implements RentalService {
+
+    private static final String RESOURCE_RENTAL = &quot;Rental&quot;;
+    private static final String RESOURCE_PAYMENT = &quot;Payment&quot;;
+    private static final String FIELD_ID = &quot;id&quot;;
+
+    private final RentalRepository rentalRepository;
+    private final PaymentRepository paymentRepository;
+    private final RentalMapper rentalMapper;
+    private final PaymentMapper paymentMapper;
+
+    // ── Write operations ─────────────────────────────────────────────────────
+
+    @Override
+    @Transactional
+    public RentalCheckoutResponseDto checkout (RentalCheckoutRequestDto dto) {
+<span class="fc" id="L63">        validateCheckoutRequest (dto);</span>
+
+<span class="fc" id="L65">        log.debug (&quot;Executing checkout for customerId: {}, inventoryId: {}&quot;,</span>
+<span class="fc" id="L66">                dto.rental ().customerId (), dto.rental ().inventoryId ());</span>
+
+
+<span class="fc" id="L69">        Rental rental = rentalMapper.toEntity (dto.rental ());</span>
+<span class="fc" id="L70">        rental.setId (null);</span>
+<span class="fc" id="L71">        Rental savedRental = rentalRepository.save (rental);</span>
+
+<span class="fc" id="L73">        Payment payment = paymentMapper.toEntity (dto.payment ());</span>
+<span class="fc" id="L74">        payment.setId (null);</span>
+<span class="fc" id="L75">        payment.setRental (savedRental);</span>
+<span class="fc" id="L76">        Payment savedPayment = paymentRepository.save (payment);</span>
+
+<span class="fc" id="L78">        log.info (&quot;Checkout completed with rental ID: {} and payment ID: {}&quot;,</span>
+<span class="fc" id="L79">                savedRental.getId (), savedPayment.getId ());</span>
+
+<span class="fc" id="L81">        return new RentalCheckoutResponseDto (</span>
+<span class="fc" id="L82">                rentalMapper.toResponseDto (rentalRepository.findById (savedRental.getId ()).orElseThrow ()),</span>
+<span class="fc" id="L83">                paymentMapper.toResponseDto (paymentRepository.findById (savedPayment.getId ()).orElseThrow ())</span>
+        );
+    }
+
+    @Override
+    @Transactional
+    public RentalResponseDto create (RentalRequestDto dto) {
+<span class="fc" id="L90">        log.debug (&quot;Creating new rental for customerId: {}, inventoryId: {}&quot;,</span>
+<span class="fc" id="L91">                dto.customerId (), dto.inventoryId ());</span>
+
+<span class="fc" id="L93">        Rental rental = rentalMapper.toEntity (dto);</span>
+<span class="fc" id="L94">        rental.setId (null); // ID is always DB-generated; ignore any value in the DTO</span>
+
+<span class="fc" id="L96">        Rental saved = rentalRepository.save (rental);</span>
+<span class="fc" id="L97">        log.info (&quot;Created rental with ID: {}&quot;, saved.getId ());</span>
+
+<span class="fc" id="L99">        return rentalMapper.toResponseDto (rentalRepository.findById (saved.getId ()).orElseThrow ());</span>
+    }
+
+    @Override
+    @Transactional
+    public RentalResponseDto update (Integer id, RentalRequestDto dto) {
+<span class="fc" id="L105">        log.debug (&quot;Fully updating rental with ID: {}&quot;, id);</span>
+
+<span class="fc" id="L107">        Rental existing = rentalRepository.findById (id)</span>
+<span class="fc" id="L108">                .orElseThrow (() -&gt; new ResourceNotFoundException (RESOURCE_RENTAL, FIELD_ID, id));</span>
+
+<span class="fc" id="L110">        existing.setRentalDate (dto.rentalDate ());</span>
+<span class="fc" id="L111">        existing.setInventoryId (dto.inventoryId ());</span>
+<span class="fc" id="L112">        existing.setCustomerId (dto.customerId ());</span>
+<span class="fc" id="L113">        existing.setReturnDate (dto.returnDate ());</span>
+<span class="fc" id="L114">        existing.setStaffId (dto.staffId ());</span>
+<span class="fc" id="L115">        existing.setLastUpdate (dto.lastUpdate ());</span>
+
+<span class="fc" id="L117">        rentalRepository.save (existing);</span>
+<span class="fc" id="L118">        log.info (&quot;Updated rental with ID: {}&quot;, id);</span>
+
+<span class="fc" id="L120">        return rentalMapper.toResponseDto (rentalRepository.findById (id).orElseThrow ());</span>
+    }
+
+    @Override
+    @Transactional
+    public RentalResponseDto partialUpdate (Integer id, RentalRequestDto dto) {
+<span class="fc" id="L126">        log.debug (&quot;Partially updating rental with ID: {}&quot;, id);</span>
+
+<span class="fc" id="L128">        Rental existing = rentalRepository.findById (id)</span>
+<span class="fc" id="L129">                .orElseThrow (() -&gt; new ResourceNotFoundException (RESOURCE_RENTAL, FIELD_ID, id));</span>
+
+        // Apply only non-null scalar fields via the MapStruct partial-update method.
+<span class="fc" id="L132">        rentalMapper.partialUpdate (dto, existing);</span>
+
+<span class="fc" id="L134">        rentalRepository.save (existing);</span>
+<span class="fc" id="L135">        log.info (&quot;Patched rental with ID: {}&quot;, id);</span>
+
+<span class="fc" id="L137">        return rentalMapper.toResponseDto (rentalRepository.findById (id).orElseThrow ());</span>
+    }
+
+    @Override
+    @Transactional
+    public void delete (Integer id) {
+<span class="fc" id="L143">        log.debug (&quot;Deleting rental with ID: {}&quot;, id);</span>
+
+<span class="fc bfc" id="L145" title="All 2 branches covered.">        if (!rentalRepository.existsById (id)) {</span>
+<span class="fc" id="L146">            throw new ResourceNotFoundException (RESOURCE_RENTAL, FIELD_ID, id);</span>
+        }
+
+<span class="fc" id="L149">        rentalRepository.deleteById (id);</span>
+<span class="fc" id="L150">        log.info (&quot;Deleted rental with ID: {}&quot;, id);</span>
+<span class="fc" id="L151">    }</span>
+
+    // ── Read operations ───────────────────────────────────────────────────────
+
+    @Override
+    public RentalResponseDto findById (Integer id) {
+<span class="fc" id="L157">        log.debug (&quot;Fetching rental with ID: {}&quot;, id);</span>
+
+<span class="fc" id="L159">        return rentalRepository.findById (id)</span>
+<span class="fc" id="L160">                .map (rentalMapper::toResponseDto)</span>
+<span class="fc" id="L161">                .orElseThrow (() -&gt; new ResourceNotFoundException (RESOURCE_RENTAL, FIELD_ID, id));</span>
+    }
+
+    @Override
+    public List&lt;RentalResponseDto&gt; findAll () {
+<span class="fc" id="L166">        log.debug (&quot;Fetching all rentals&quot;);</span>
+<span class="fc" id="L167">        return rentalRepository.findAll ()</span>
+<span class="fc" id="L168">                .stream ()</span>
+<span class="fc" id="L169">                .map (rentalMapper::toResponseDto)</span>
+<span class="fc" id="L170">                .toList ();</span>
+    }
+
+    @Override
+    public Page&lt;RentalResponseDto&gt; findAll (Pageable pageable) {
+<span class="fc" id="L175">        log.debug (&quot;Fetching rentals — page {}, size {}&quot;,</span>
+<span class="fc" id="L176">                pageable.getPageNumber (), pageable.getPageSize ());</span>
+<span class="fc" id="L177">        return rentalRepository.findAll (pageable).map (rentalMapper::toResponseDto);</span>
+    }
+
+    @Override
+    public boolean existsById (Integer id) {
+<span class="fc" id="L182">        return rentalRepository.existsById (id);</span>
+    }
+
+    @Override
+    public long count () {
+<span class="fc" id="L187">        return rentalRepository.count ();</span>
+    }
+
+    private void validateCheckoutRequest (RentalCheckoutRequestDto dto) {
+<span class="pc bpc" id="L191" title="1 of 2 branches missed.">        if (dto.rental () == null) {</span>
+<span class="nc" id="L192">            throw new BadRequestException (</span>
+                    &quot;Rental details are required for checkout&quot;, RESOURCE_RENTAL, &quot;rental.missing&quot;);
+        }
+<span class="pc bpc" id="L195" title="1 of 2 branches missed.">        if (dto.payment () == null) {</span>
+<span class="nc" id="L196">            throw new BadRequestException (</span>
+                    &quot;Payment details are required for checkout&quot;, RESOURCE_PAYMENT, &quot;payment.missing&quot;);
+        }
+
+<span class="fc" id="L200">        PaymentRequestDto payment = dto.payment ();</span>
+<span class="fc" id="L201">        RentalRequestDto rental = dto.rental ();</span>
+
+<span class="fc bfc" id="L203" title="All 2 branches covered.">        if (!Objects.equals (payment.customerId (), rental.customerId ())) {</span>
+<span class="fc" id="L204">            throw new BadRequestException (</span>
+                    &quot;Payment customerId must match rental customerId&quot;,
+                    RESOURCE_PAYMENT,
+                    &quot;payment.customer.mismatch&quot;
+            );
+        }
+
+<span class="pc bpc" id="L211" title="1 of 2 branches missed.">        if (!Objects.equals (payment.staffId (), rental.staffId ())) {</span>
+<span class="nc" id="L212">            throw new BadRequestException (</span>
+                    &quot;Payment staffId must match rental staffId&quot;,
+                    RESOURCE_PAYMENT,
+                    &quot;payment.staff.mismatch&quot;
+            );
+        }
+<span class="fc" id="L218">    }</span>
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

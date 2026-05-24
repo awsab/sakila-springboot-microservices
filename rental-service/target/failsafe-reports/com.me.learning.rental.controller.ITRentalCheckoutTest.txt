@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.me.learning.rental.controller.ITRentalCheckoutTest
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 13.73 s -- in com.me.learning.rental.controller.ITRentalCheckoutTest

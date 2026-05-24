@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RentalController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">rental-service</a> &gt; <a href="index.source.html" class="el_package">com.me.learning.rental.controller</a> &gt; <span class="el_source">RentalController.java</span></div><h1>RentalController.java</h1><pre class="source lang-java linenums">package com.me.learning.rental.controller;
+
+import java.util.List;
+
+import jakarta.validation.Valid;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import com.me.learning.rental.dto.RentalCheckoutRequestDto;
+import com.me.learning.rental.dto.RentalCheckoutResponseDto;
+import com.me.learning.rental.dto.RentalRequestDto;
+import com.me.learning.rental.dto.RentalResponseDto;
+import com.me.learning.rental.service.RentalService;
+
+/**
+ * REST controller for {@link com.me.learning.rental.entity.Rental} management.
+ *
+ * &lt;p&gt;Base path: {@code /api/v1/rentals}
+ *
+ * &lt;p&gt;All endpoints delegate to {@link RentalService} and follow the standard
+ * response conventions:
+ * &lt;ul&gt;
+ *   &lt;li&gt;{@code POST}   → 201 Created with the created resource in the body&lt;/li&gt;
+ *   &lt;li&gt;{@code PUT}    → 200 OK with the fully updated resource&lt;/li&gt;
+ *   &lt;li&gt;{@code PATCH}  → 200 OK with the partially updated resource&lt;/li&gt;
+ *   &lt;li&gt;{@code GET}    → 200 OK with requested resource(s)&lt;/li&gt;
+ *   &lt;li&gt;{@code DELETE} → 204 No Content&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;p&gt;Error responses are handled globally by
+ * {@code com.me.learning.framework.web.errors.GlobalExceptionHandler}.
+ */
+<span class="fc" id="L56">@Slf4j</span>
+@RestController
+@RequestMapping (&quot;/api/v1/rentals&quot;)
+@RequiredArgsConstructor
+@Tag (name = &quot;Rental&quot;, description = &quot;Rental management APIs&quot;)
+public class RentalController {
+
+    private final RentalService rentalService;
+
+    // ── Business action: checkout (rent + collect payment) ───────────────────
+
+    @PostMapping (&quot;/checkout&quot;)
+    @Operation (
+            summary = &quot;Rent a CD and collect payment in one transaction&quot;,
+            description = &quot;Implements the Sakila checkout flow: creates the rental row first, then &quot;
+                    + &quot;creates a linked payment row using the generated rental ID. The `payment.rental` &quot;
+                    + &quot;field, if supplied, is ignored during checkout because the rental does not exist yet.&quot;
+    )
+    @ApiResponse (
+            responseCode = &quot;201&quot;, description = &quot;Checkout completed successfully&quot;,
+            content = @Content (schema = @Schema (implementation = RentalCheckoutResponseDto.class)))
+    @ApiResponse (
+            responseCode = &quot;400&quot;, description = &quot;Validation error or payment/rental mismatch&quot;)
+    public ResponseEntity&lt;RentalCheckoutResponseDto&gt; checkout (
+            @Valid @RequestBody RentalCheckoutRequestDto dto) {
+<span class="fc" id="L81">        log.info (&quot;REST POST /api/v1/rentals/checkout — customerId {}, inventoryId {}&quot;,</span>
+<span class="fc" id="L82">                dto.rental ().customerId (), dto.rental ().inventoryId ());</span>
+<span class="fc" id="L83">        return ResponseEntity.status (HttpStatus.CREATED).body (rentalService.checkout (dto));</span>
+    }
+
+    // ── Create ────────────────────────────────────────────────────────────────
+
+    @PostMapping
+    @Operation (
+            summary = &quot;Create a new rental&quot;,
+            description = &quot;Creates a rental record. The `id` field in the request body is ignored; &quot;
+                    + &quot;the ID is always assigned by the database.&quot;
+    )
+    @ApiResponse (
+            responseCode = &quot;201&quot;, description = &quot;Rental created successfully&quot;,
+            content = @Content (schema = @Schema (implementation = RentalResponseDto.class)))
+    @ApiResponse (
+            responseCode = &quot;400&quot;, description = &quot;Validation error — check field constraints&quot;)
+    public ResponseEntity&lt;RentalResponseDto&gt; create (
+            @Valid @RequestBody RentalRequestDto dto) {
+<span class="fc" id="L101">        log.info (&quot;REST POST /api/v1/rentals — creating rental for customerId: {}&quot;, dto.customerId ());</span>
+<span class="fc" id="L102">        return ResponseEntity.status (HttpStatus.CREATED).body (rentalService.create (dto));</span>
+    }
+
+    // ── Full update ───────────────────────────────────────────────────────────
+
+    @PutMapping (&quot;/{id}&quot;)
+    @Operation (
+            summary = &quot;Fully update a rental&quot;,
+            description = &quot;Replaces ALL editable fields of the rental identified by `id`. &quot;
+                    + &quot;Any field not sent in the request body will be set to its supplied value &quot;
+                    + &quot;(null-safe update is not applied — use PATCH for partial updates).&quot;
+    )
+    @ApiResponse (
+            responseCode = &quot;200&quot;, description = &quot;Rental updated successfully&quot;,
+            content = @Content (schema = @Schema (implementation = RentalResponseDto.class)))
+    @ApiResponse (
+            responseCode = &quot;404&quot;, description = &quot;Rental not found&quot;)
+    public ResponseEntity&lt;RentalResponseDto&gt; update (
+            @Parameter (description = &quot;Rental primary key&quot;) @PathVariable Integer id,
+            @Valid @RequestBody RentalRequestDto dto) {
+<span class="fc" id="L122">        log.info (&quot;REST PUT /api/v1/rentals/{} — full update&quot;, id);</span>
+<span class="fc" id="L123">        return ResponseEntity.ok (rentalService.update (id, dto));</span>
+    }
+
+    // ── Partial update ────────────────────────────────────────────────────────
+
+    @PatchMapping (&quot;/{id}&quot;)
+    @Operation (
+            summary = &quot;Partially update a rental&quot;,
+            description = &quot;Updates only the non-null fields supplied in the request body. &quot;
+                    + &quot;Fields omitted or explicitly set to `null` are left unchanged.&quot;
+    )
+    @ApiResponse (
+            responseCode = &quot;200&quot;, description = &quot;Rental patched successfully&quot;,
+            content = @Content (schema = @Schema (implementation = RentalResponseDto.class)))
+    @ApiResponse (
+            responseCode = &quot;404&quot;, description = &quot;Rental not found&quot;)
+    public ResponseEntity&lt;RentalResponseDto&gt; partialUpdate (
+            @Parameter (description = &quot;Rental primary key&quot;) @PathVariable Integer id,
+            @RequestBody RentalRequestDto dto) {
+<span class="fc" id="L142">        log.info (&quot;REST PATCH /api/v1/rentals/{} — partial update&quot;, id);</span>
+<span class="fc" id="L143">        return ResponseEntity.ok (rentalService.partialUpdate (id, dto));</span>
+    }
+
+    // ── Read by ID ────────────────────────────────────────────────────────────
+
+    @GetMapping (&quot;/{id}&quot;)
+    @Operation (
+            summary = &quot;Get a rental by ID&quot;,
+            description = &quot;Returns the rental record identified by the given primary key.&quot;
+    )
+    @ApiResponse (
+            responseCode = &quot;200&quot;, description = &quot;Rental found&quot;,
+            content = @Content (schema = @Schema (implementation = RentalResponseDto.class)))
+    @ApiResponse (
+            responseCode = &quot;404&quot;, description = &quot;Rental not found&quot;)
+    public ResponseEntity&lt;RentalResponseDto&gt; findById (
+            @Parameter (description = &quot;Rental primary key&quot;) @PathVariable Integer id) {
+<span class="fc" id="L160">        log.info (&quot;REST GET /api/v1/rentals/{}&quot;, id);</span>
+<span class="fc" id="L161">        return ResponseEntity.ok (rentalService.findById (id));</span>
+    }
+
+    // ── List / Paginated ──────────────────────────────────────────────────────
+
+    @GetMapping
+    @Operation (
+            summary = &quot;List all rentals (paginated)&quot;,
+            description = &quot;Returns a page of rentals. Default page size is 20. &quot;
+                    + &quot;Supports Spring Data pagination parameters: `page`, `size`, `sort`.&quot;
+    )
+    @ApiResponse (
+            responseCode = &quot;200&quot;, description = &quot;Rentals retrieved&quot;)
+    public ResponseEntity&lt;Page&lt;RentalResponseDto&gt;&gt; findAll (
+            @PageableDefault (size = 20) Pageable pageable) {
+<span class="fc" id="L176">        log.info (&quot;REST GET /api/v1/rentals — page {}, size {}&quot;,</span>
+<span class="fc" id="L177">                pageable.getPageNumber (), pageable.getPageSize ());</span>
+<span class="fc" id="L178">        return ResponseEntity.ok (rentalService.findAll (pageable));</span>
+    }
+
+    @GetMapping (&quot;/all&quot;)
+    @Operation (
+            summary = &quot;List all rentals (unpaged)&quot;,
+            description = &quot;Returns the complete list of rentals without pagination. &quot;
+                    + &quot;Use with caution on large data sets; prefer the paginated endpoint.&quot;
+    )
+    @ApiResponse (
+            responseCode = &quot;200&quot;, description = &quot;All rentals retrieved&quot;)
+    public ResponseEntity&lt;List&lt;RentalResponseDto&gt;&gt; getAllRentals () {
+<span class="fc" id="L190">        log.info (&quot;REST GET /api/v1/rentals/all&quot;);</span>
+<span class="fc" id="L191">        return ResponseEntity.ok (rentalService.findAll ());</span>
+    }
+
+    // ── Delete ────────────────────────────────────────────────────────────────
+
+    @DeleteMapping (&quot;/{id}&quot;)
+    @Operation (summary = &quot;Delete a rental by ID&quot;)
+    @ApiResponse (
+            responseCode = &quot;204&quot;, description = &quot;Rental deleted successfully&quot;)
+    @ApiResponse (
+            responseCode = &quot;404&quot;, description = &quot;Rental not found&quot;)
+    public ResponseEntity&lt;Void&gt; delete (
+            @Parameter (description = &quot;Rental primary key&quot;) @PathVariable Integer id) {
+<span class="fc" id="L204">        log.info (&quot;REST DELETE /api/v1/rentals/{}&quot;, id);</span>
+<span class="fc" id="L205">        rentalService.delete (id);</span>
+<span class="fc" id="L206">        return ResponseEntity.noContent ().build ();</span>
+    }
+
+    // ── Utility ───────────────────────────────────────────────────────────────
+
+    @GetMapping (&quot;/count&quot;)
+    @Operation (summary = &quot;Count total number of rentals&quot;)
+    @ApiResponse (
+            responseCode = &quot;200&quot;, description = &quot;Count returned&quot;)
+    public ResponseEntity&lt;Long&gt; count () {
+<span class="fc" id="L216">        return ResponseEntity.ok (rentalService.count ());</span>
+    }
+
+    @GetMapping (&quot;/exists/{id}&quot;)
+    @Operation (summary = &quot;Check whether a rental exists by ID&quot;)
+    @ApiResponse (
+            responseCode = &quot;200&quot;, description = &quot;Existence flag returned&quot;)
+    public ResponseEntity&lt;Boolean&gt; existsById (
+            @Parameter (description = &quot;Rental primary key&quot;) @PathVariable Integer id) {
+<span class="fc" id="L225">        return ResponseEntity.ok (rentalService.existsById (id));</span>
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.14.202510111229</span></div></body></html>

@@ -1,0 +1,2 @@
+07:45:17.855 [main] INFO com.me.learning.inventory.service.InventoryServiceImpl -- Updated inventory with ID: 1
+07:45:17.860 [main] INFO com.me.learning.inventory.service.InventoryServiceImpl -- Updated inventory with ID: 1

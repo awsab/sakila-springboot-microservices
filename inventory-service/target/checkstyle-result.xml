@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="9.3">
+<file name="C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\controller\InventoryController.java">
+</file>
+<file name="C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\dto\InventoryRequestDto.java">
+</file>
+<file name="C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\dto\InventoryResponseDto.java">
+</file>
+<file name="C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\dto\StoreRefDto.java">
+</file>
+<file name="C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\entity\Inventory.java">
+</file>
+<file name="C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\entity\Store.java">
+</file>
+<file name="C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\InventoryServiceApplication.java">
+</file>
+<file name="C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\mapper\InventoryMapper.java">
+</file>
+<file name="C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\repository\InventoryRepository.java">
+</file>
+<file name="C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\repository\StoreRepository.java">
+</file>
+<file name="C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\service\InventoryService.java">
+</file>
+<file name="C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\service\InventoryServiceImpl.java">
+</file>
+<file name="C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\test\java\com\me\learning\inventory\controller\InventoryControllerIT.java">
+</file>
+<file name="C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\test\java\com\me\learning\inventory\InventoryServiceApplicationTests.java">
+</file>
+<file name="C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\test\java\com\me\learning\inventory\service\InventoryServiceImplTest.java">
+</file>
+</checkstyle>

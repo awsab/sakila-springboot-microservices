@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.me.learning.inventory.controller.InventoryControllerIT
+-------------------------------------------------------------------------------
+Tests run: 0, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 15.24 s -- in com.me.learning.inventory.controller.InventoryControllerIT

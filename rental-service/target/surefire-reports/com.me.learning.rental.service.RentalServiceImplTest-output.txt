@@ -1,0 +1,1 @@
+07:46:35.026 [main] INFO com.me.learning.rental.service.RentalServiceImpl -- Created rental with ID: 42

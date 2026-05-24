@@ -1,0 +1,12 @@
+C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\controller\InventoryController.java
+C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\dto\InventoryRequestDto.java
+C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\dto\InventoryResponseDto.java
+C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\dto\StoreRefDto.java
+C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\entity\Inventory.java
+C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\entity\Store.java
+C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\InventoryServiceApplication.java
+C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\mapper\InventoryMapper.java
+C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\repository\InventoryRepository.java
+C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\repository\StoreRepository.java
+C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\service\InventoryService.java
+C:\Ramu\GitHub_Repo\sakila-springboot-microservices\inventory-service\src\main\java\com\me\learning\inventory\service\InventoryServiceImpl.java
