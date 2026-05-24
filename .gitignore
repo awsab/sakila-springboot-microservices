@@ -11,6 +11,7 @@
 .idea/
 *.iml
 .vscode/
+.fastRequest/
 
 # Maven
 **/.mvn/timing.properties
