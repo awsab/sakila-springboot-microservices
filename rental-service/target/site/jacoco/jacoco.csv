@@ -1,5 +1,0 @@
-GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-rental-service,com.me.learning.rental.service,PaymentServiceImpl,14,278,2,6,2,55,4,15,2,13
-rental-service,com.me.learning.rental.service,RentalServiceImpl,21,355,3,7,3,70,3,17,0,15
-rental-service,com.me.learning.rental.controller,PaymentController,52,44,0,0,10,9,5,5,5,5
-rental-service,com.me.learning.rental.controller,RentalController,0,113,0,0,0,22,0,11,0,11

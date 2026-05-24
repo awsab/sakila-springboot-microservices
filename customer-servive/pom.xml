@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+
+    <parent>
+        <groupId>com.me.learning.parent</groupId>
+        <artifactId>sakila-parent</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../sakila-parent/pom.xml</relativePath>
+    </parent>
+
+
+    <groupId>com.me.learning.customer</groupId>
+    <artifactId>customer-servive</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>customer-servive</name>
+    <description>customer-servive</description>
+
+    <properties>
+        <spring-cloud.version>2025.1.1</spring-cloud.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.me.learning.parent</groupId>
+            <artifactId>sakila-framework</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

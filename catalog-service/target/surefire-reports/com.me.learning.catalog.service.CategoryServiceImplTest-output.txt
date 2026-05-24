@@ -1,1 +1,0 @@
-07:43:31.696 [main] INFO com.me.learning.catalog.service.CategoryServiceImpl -- Deleted category with ID: 1

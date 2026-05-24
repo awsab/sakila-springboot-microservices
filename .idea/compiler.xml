@@ -36,15 +36,24 @@
         <module name="eureka-registry" />
         <module name="rental-service" />
         <module name="inventory-service" />
-        <module name="customer-service" />
         <module name="catalog-service" />
       </profile>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="customer-servive" />
+      </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="customer-service" target="25" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="catalog-service" options="-parameters -parameters" />
       <module name="customer-service" options="-parameters -parameters" />
+      <module name="customer-servive" options="-parameters" />
       <module name="eureka-registry" options="-parameters -parameters" />
       <module name="inventory-service" options="-parameters -parameters" />
       <module name="rental-service" options="-parameters -parameters" />

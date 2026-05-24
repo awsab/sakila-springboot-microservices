@@ -1,1 +1,0 @@
-07:46:31.748 [main] INFO com.me.learning.rental.service.RentalServiceImpl -- Checkout completed with rental ID: 10 and payment ID: 20

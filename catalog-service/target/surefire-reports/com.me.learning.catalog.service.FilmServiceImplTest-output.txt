@@ -1,1 +1,0 @@
-07:43:36.494 [main] INFO com.me.learning.catalog.service.FilmServiceImpl -- Deleted film with ID: 1

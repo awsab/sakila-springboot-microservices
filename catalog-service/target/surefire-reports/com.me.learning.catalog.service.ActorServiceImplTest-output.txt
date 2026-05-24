@@ -1,1 +1,0 @@
-07:43:28.824 [main] INFO com.me.learning.catalog.service.ActorServiceImpl -- Deleted actor with ID: 1

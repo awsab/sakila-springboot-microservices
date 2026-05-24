@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.me.learning.rental.service.RentalCheckoutServiceImplTest
--------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.113 s -- in com.me.learning.rental.service.RentalCheckoutServiceImplTest

@@ -1,4 +1,0 @@
-GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-catalog-service,com.me.learning.catalog.service,FilmServiceImpl,27,689,15,55,2,144,17,47,2,27
-catalog-service,com.me.learning.catalog.service,CategoryServiceImpl,1,276,1,29,0,55,1,26,0,12
-catalog-service,com.me.learning.catalog.service,ActorServiceImpl,0,294,0,30,0,62,0,28,0,13
