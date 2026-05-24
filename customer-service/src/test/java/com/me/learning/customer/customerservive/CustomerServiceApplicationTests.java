@@ -8,6 +8,7 @@ class CustomerServiveApplicationTests {
 
     @Test
     void contextLoads () {
+        assertDoesNotThrow (() -> {}, "The Spring application context should load without exceptions");
     }
 
 }
