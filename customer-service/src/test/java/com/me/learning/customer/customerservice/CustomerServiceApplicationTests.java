@@ -1,10 +1,11 @@
-package com.me.learning.customer.customerservive;
+package com.me.learning.customer.customerservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @SpringBootTest
-class CustomerServiveApplicationTests {
+class CustomerServiceApplicationTests {
 
     @Test
     void contextLoads () {

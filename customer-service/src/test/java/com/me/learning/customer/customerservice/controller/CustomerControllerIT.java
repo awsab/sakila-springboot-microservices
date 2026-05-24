@@ -1,4 +1,4 @@
-package com.me.learning.customer.customerservive.controller;
+package com.me.learning.customer.customerservice.controller;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.anyOf;

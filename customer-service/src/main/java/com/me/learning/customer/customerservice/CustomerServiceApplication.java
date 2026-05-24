@@ -1,13 +1,13 @@
-package com.me.learning.customer.customerservive;
+package com.me.learning.customer.customerservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CustomerServiveApplication {
+public class CustomerServiceApplication {
 
     public static void main (String[] args) {
-        SpringApplication.run (CustomerServiveApplication.class, args);
+        SpringApplication.run (CustomerServiceApplication.class, args);
     }
 
 }
