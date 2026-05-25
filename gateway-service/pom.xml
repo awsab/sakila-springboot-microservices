@@ -21,15 +21,78 @@
         <spring-cloud.version>2025.1.1</spring-cloud.version>
     </properties>
 
+    <!--
+        Force opentelemetry-semconv to the higher version required by micrometer-tracing-bridge-otel
+        (transitively pulled by spring-boot-starter-opentelemetry).
+        opentelemetry-logback-appender-1.0 brings an older version (1.32.0); pinning to 1.37.0
+        here satisfies the enforcer DependencyConvergence rule.
+    -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.opentelemetry.semconv</groupId>
+                <artifactId>opentelemetry-semconv</artifactId>
+                <version>1.37.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
+        <!-- Gateway service doesn't need sakila-framework — it doesn't use Spring MVC, JPA, etc. -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway-server-webflux</artifactId>
         </dependency>
+
+        <!-- Eureka client for service discovery -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
+
+        <!-- Observability using OpenTelemetry -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-opentelemetry</artifactId>
+        </dependency>
+
+        <!-- Operational endpoints (health, metrics, gateway) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- Resilience4j circuit breaker support for reactive gateway routes -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
+        </dependency>
+
+        <!-- Prometheus scraping endpoint via /actuator/prometheus -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+
+        <!-- Lombok — compile-time code generation; excluded from fat JAR by spring-boot-maven-plugin -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!--
+            OpenTelemetry Logback appender — bridges Logback log events into the OTel Logs pipeline.
+            Version NOT in spring-boot-dependencies BOM; pin explicitly to the alpha release that
+            matches OTel API 1.55.0 (managed by spring-boot-opentelemetry 4.0.5).
+        -->
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-logback-appender-1.0</artifactId>
+            <version>2.16.0-alpha</version>
+        </dependency>
+
+        <!-- Testing — 'test' scope is NOT transitive. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

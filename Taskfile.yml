@@ -1,0 +1,197 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  COMPOSE_FILE: docker-compose.local-pod.yml
+  TAIL: '200'
+  MVN_CMD: mvn
+  PROFILE: sit
+  CLEAN_CONTAINERS: 'false'
+
+tasks:
+  default:
+    desc: List available tasks
+    cmds:
+      - task --list
+
+  mvn:verify:
+    desc: Run full multi-module clean verify (default profile)
+    cmds:
+      - '{{.MVN_CMD}} clean verify'
+
+  mvn:verify:sit:
+    desc: Run full multi-module verify with SIT profile
+    cmds:
+      - '{{.MVN_CMD}} clean verify -P SIT'
+
+  mvn:verify:uat:
+    desc: Run full multi-module verify with UAT profile
+    cmds:
+      - '{{.MVN_CMD}} clean verify -P UAT'
+
+  mvn:verify:prod:
+    desc: Run full multi-module verify with PROD profile
+    cmds:
+      - '{{.MVN_CMD}} clean verify -P PROD'
+
+  mvn:test:
+    desc: Run unit tests across all modules
+    cmds:
+      - '{{.MVN_CMD}} test'
+
+  mvn:test:module:
+    desc: "Run tests for one module and its dependencies (usage: task mvn:test:module MODULE=gateway-service)"
+    requires:
+      vars: [MODULE]
+    cmds:
+      - '{{.MVN_CMD}} -pl {{.MODULE}} -am test'
+
+  mvn:package:
+    desc: Build artifacts for all modules
+    cmds:
+      - '{{.MVN_CMD}} clean package'
+
+  mvn:install:
+    desc: Install all module artifacts into local Maven repository
+    cmds:
+      - '{{.MVN_CMD}} clean install'
+
+  mvn:install:framework:
+    desc: Install the shared sakila-framework artifact only
+    cmds:
+      - '{{.MVN_CMD}} -pl sakila-framework install -DskipTests'
+
+  mvn:lint:
+    desc: Run Checkstyle, PMD, and SpotBugs checks (skip tests)
+    cmds:
+      - '{{.MVN_CMD}} -DskipTests checkstyle:check pmd:check spotbugs:check'
+
+  mvn:cve:
+    desc: Run OWASP dependency vulnerability scan
+    cmds:
+      - '{{.MVN_CMD}} -P PROD org.owasp:dependency-check-maven:check'
+
+  deps:updates:
+    desc: Show available dependency and plugin updates
+    cmds:
+      - '{{.MVN_CMD}} versions:display-plugin-updates versions:display-dependency-updates'
+
+  svc:run:module:
+    desc: "Run a service module locally (usage: task svc:run:module MODULE=gateway-service PROFILE=sit)"
+    requires:
+      vars: [MODULE]
+    deps: [mvn:install:framework]
+    cmds:
+      - '{{.MVN_CMD}} -f {{.MODULE}}/pom.xml spring-boot:run -Dspring-boot.run.profiles={{.PROFILE}}'
+
+  svc:run:eureka:
+    desc: Run eureka-registry locally (override PROFILE=sit|uat|prod)
+    deps: [mvn:install:framework]
+    cmds:
+      - '{{.MVN_CMD}} -f eureka-registry/pom.xml spring-boot:run -Dspring-boot.run.profiles={{.PROFILE}}'
+
+  svc:run:gateway:
+    desc: Run gateway-service locally (override PROFILE=sit|uat|prod)
+    deps: [mvn:install:framework]
+    cmds:
+      - '{{.MVN_CMD}} -f gateway-service/pom.xml spring-boot:run -Dspring-boot.run.profiles={{.PROFILE}}'
+
+  svc:run:catalog:
+    desc: Run catalog-service locally (override PROFILE=sit|uat|prod)
+    deps: [mvn:install:framework]
+    cmds:
+      - '{{.MVN_CMD}} -f catalog-service/pom.xml spring-boot:run -Dspring-boot.run.profiles={{.PROFILE}}'
+
+  svc:run:customer:
+    desc: Run customer-service locally (override PROFILE=sit|uat|prod)
+    deps: [mvn:install:framework]
+    cmds:
+      - '{{.MVN_CMD}} -f customer-service/pom.xml spring-boot:run -Dspring-boot.run.profiles={{.PROFILE}}'
+
+  svc:run:rental:
+    desc: Run rental-service locally (override PROFILE=sit|uat|prod)
+    deps: [mvn:install:framework]
+    cmds:
+      - '{{.MVN_CMD}} -f rental-service/pom.xml spring-boot:run -Dspring-boot.run.profiles={{.PROFILE}}'
+
+  svc:run:inventory:
+    desc: Run inventory-service locally (override PROFILE=sit|uat|prod)
+    deps: [mvn:install:framework]
+    cmds:
+      - '{{.MVN_CMD}} -f inventory-service/pom.xml spring-boot:run -Dspring-boot.run.profiles={{.PROFILE}}'
+
+  pod:build-images:
+    desc: Build all service images with explicit Dockerfile paths
+    cmds:
+      - podman build -f eureka-registry/Dockerfile -t sakila/eureka-registry:local .
+      - podman build -f catalog-service/Dockerfile -t sakila/catalog-service:local .
+      - podman build -f customer-service/Dockerfile -t sakila/customer-service:local .
+      - podman build -f rental-service/Dockerfile -t sakila/rental-service:local .
+      - podman build -f inventory-service/Dockerfile -t sakila/inventory-service:local .
+      - podman build -f gateway-service/Dockerfile -t sakila/gateway-service:local .
+
+  pod:up:
+    desc: Build images and start the local stack without compose-time builds
+    deps: [pod:build-images]
+    cmds:
+      - podman-compose.exe -f {{.COMPOSE_FILE}} up -d --no-build
+
+  pod:down:
+    desc: Stop and remove the local stack
+    cmds:
+      - podman-compose.exe -f {{.COMPOSE_FILE}} down
+
+  pod:rebuild:
+    desc: Recreate the full local stack (down, build-images, up)
+    cmds:
+      - task pod:down
+      - task pod:build-images
+      - podman-compose.exe -f {{.COMPOSE_FILE}} up -d --no-build
+
+  pod:restart:service:
+    desc: "Restart one service container (usage: task pod:restart:service SERVICE=inventory-service)"
+    requires:
+      vars: [SERVICE]
+    cmds:
+      - podman-compose.exe -f {{.COMPOSE_FILE}} restart {{.SERVICE}}
+
+  pod:ps:
+    desc: Show running containers in the local stack
+    cmds:
+      - podman-compose.exe -f {{.COMPOSE_FILE}} ps
+
+  pod:logs:
+    desc: Follow logs for all services (override with TAIL=500)
+    cmds:
+      - podman-compose.exe -f {{.COMPOSE_FILE}} logs -f --tail={{.TAIL}}
+
+  pod:logs:service:
+    desc: "Follow logs for a single service (usage: task pod:logs:service SERVICE=gateway-service TAIL=500)"
+    requires:
+      vars: [SERVICE]
+    cmds:
+      - podman-compose.exe -f {{.COMPOSE_FILE}} logs -f --tail={{.TAIL}} {{.SERVICE}}
+
+  pod:logs:tail:
+    desc: Show last N log lines for all services (default TAIL=200)
+    cmds:
+      - podman-compose.exe -f {{.COMPOSE_FILE}} logs --tail={{.TAIL}}
+
+  pod:logs:tail:service:
+    desc: "Show last N log lines for a single service (usage: task pod:logs:tail:service SERVICE=gateway-service TAIL=500)"
+    requires:
+      vars: [SERVICE]
+    cmds:
+      - podman-compose.exe -f {{.COMPOSE_FILE}} logs --tail={{.TAIL}} {{.SERVICE}}
+
+  pod:health:
+    desc: Quick HTTP reachability checks for Eureka, Gateway, and core APIs
+    cmds:
+      - 'powershell -NoProfile -Command "$ErrorActionPreference = ''Stop''; $urls = @(''http://localhost:8761/'',''http://localhost:8080/'',''http://localhost:8091/'',''http://localhost:8092/'',''http://localhost:8093/'',''http://localhost:8094/''); foreach ($u in $urls) { try { $r = Invoke-WebRequest -Uri $u -Method Get -TimeoutSec 5 -UseBasicParsing; Write-Host \"OK: $u -> $($r.StatusCode)\" } catch { if ($_.Exception.Response -ne $null) { $code = [int]$_.Exception.Response.StatusCode; Write-Host \"OK: $u -> HTTP $code\" } else { Write-Error \"FAIL: $u unreachable\"; exit 1 } } }"'
+
+  clean:all:
+    desc: Remove Maven target folders (and optionally stop/prune containers)
+    cmds:
+      - 'powershell -NoProfile -Command "$ErrorActionPreference = ''Stop''; Get-ChildItem -Path . -Directory -Recurse -Filter target | ForEach-Object { Remove-Item -Recurse -Force $_.FullName }; if (''{{.CLEAN_CONTAINERS}}'' -eq ''true'') { podman-compose.exe -f {{.COMPOSE_FILE}} down; podman image prune -f }"'
+
