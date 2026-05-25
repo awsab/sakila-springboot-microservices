@@ -1,0 +1,8 @@
+podman build -f eureka-registry/Dockerfile   -t sakila/eureka-registry:local   .
+podman build -f catalog-service/Dockerfile   -t sakila/catalog-service:local   .
+podman build -f customer-service/Dockerfile  -t sakila/customer-service:local  .
+podman build -f rental-service/Dockerfile    -t sakila/rental-service:local    .
+podman build -f inventory-service/Dockerfile -t sakila/inventory-service:local .
+podman build -f gateway-service/Dockerfile   -t sakila/gateway-service:local   .
+
+podman-compose.exe -f docker-compose.local-pod.yml up -d --no-build

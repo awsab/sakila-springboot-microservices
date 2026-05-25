@@ -4,10 +4,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.sakila</groupId>
-    <artifactId>sakila-project</artifactId>
+    <artifactId>sakila-springboot-microservices</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>sakila-project</name>
+    <name>sakila-springboot-microservices</name>
     <description>Parent project for Sakila microservices</description>
 
     <properties>
@@ -26,5 +26,6 @@
         <module>inventory-service</module>
         <module>rental-service</module>
         <module>eureka-registry</module>
+        <module>gateway-service</module>
     </modules>
 </project>

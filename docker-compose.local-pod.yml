@@ -128,6 +128,26 @@ services:
     networks:
       - sakila-net
 
+  # API Gateway — single entry point for all client requests, routes to backend services.
+  gateway-service:
+    build:
+      context: .
+      dockerfile: gateway-service/Dockerfile
+    image: sakila/gateway-service:local
+    container_name: gateway-service
+    depends_on:
+      - eureka-registry
+    ports:
+      # Publish 8080 for client access to the gateway.
+      - "8080:8080"
+    environment:
+      # Override only: Eureka endpoint via container DNS.
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-registry:8761/eureka/
+      EUREKA_INSTANCE_HOSTNAME: gateway-service
+    restart: unless-stopped
+    networks:
+      - sakila-net
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Internal bridge network — containers resolve each other by service name,
 # e.g. "eureka-registry", "catalog-service".  Nothing is exposed externally
