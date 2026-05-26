@@ -6,7 +6,7 @@ vars:
   COMPOSE_FILE: docker-compose.local-pod.yml
   TAIL: '200'
   MVN_CMD: mvn
-  PROFILE: sit
+  PROFILE: dev
   CLEAN_CONTAINERS: 'false'
 
 tasks:
@@ -20,10 +20,10 @@ tasks:
     cmds:
       - '{{.MVN_CMD}} clean verify'
 
-  mvn:verify:sit:
-    desc: Run full multi-module verify with SIT profile
+  mvn:verify:dev:
+    desc: Run full multi-module verify with DEV profile
     cmds:
-      - '{{.MVN_CMD}} clean verify -P SIT'
+      - '{{.MVN_CMD}} clean verify -P DEV'
 
   mvn:verify:uat:
     desc: Run full multi-module verify with UAT profile
@@ -52,6 +52,13 @@ tasks:
     cmds:
       - '{{.MVN_CMD}} clean package'
 
+  mvn:package:images:
+    desc: Build/reuse all service jars once for container images (no clean, uses local .m2 cache)
+    cmds:
+      - '{{.MVN_CMD}} -P DEV -DskipTests package'
+      # Legacy reference (slower clean rebuild):
+      # - '{{.MVN_CMD}} clean package'
+
   mvn:install:
     desc: Install all module artifacts into local Maven repository
     cmds:
@@ -78,7 +85,7 @@ tasks:
       - '{{.MVN_CMD}} versions:display-plugin-updates versions:display-dependency-updates'
 
   svc:run:module:
-    desc: "Run a service module locally (usage: task svc:run:module MODULE=gateway-service PROFILE=sit)"
+    desc: "Run a service module locally (usage: task svc:run:module MODULE=gateway-service PROFILE=dev)"
     requires:
       vars: [MODULE]
     deps: [mvn:install:framework]
@@ -86,50 +93,58 @@ tasks:
       - '{{.MVN_CMD}} -f {{.MODULE}}/pom.xml spring-boot:run -Dspring-boot.run.profiles={{.PROFILE}}'
 
   svc:run:eureka:
-    desc: Run eureka-registry locally (override PROFILE=sit|uat|prod)
+    desc: Run eureka-registry locally (override PROFILE=dev|uat|prod)
     deps: [mvn:install:framework]
     cmds:
       - '{{.MVN_CMD}} -f eureka-registry/pom.xml spring-boot:run -Dspring-boot.run.profiles={{.PROFILE}}'
 
   svc:run:gateway:
-    desc: Run gateway-service locally (override PROFILE=sit|uat|prod)
+    desc: Run gateway-service locally (override PROFILE=dev|uat|prod)
     deps: [mvn:install:framework]
     cmds:
       - '{{.MVN_CMD}} -f gateway-service/pom.xml spring-boot:run -Dspring-boot.run.profiles={{.PROFILE}}'
 
   svc:run:catalog:
-    desc: Run catalog-service locally (override PROFILE=sit|uat|prod)
+    desc: Run catalog-service locally (override PROFILE=dev|uat|prod)
     deps: [mvn:install:framework]
     cmds:
       - '{{.MVN_CMD}} -f catalog-service/pom.xml spring-boot:run -Dspring-boot.run.profiles={{.PROFILE}}'
 
   svc:run:customer:
-    desc: Run customer-service locally (override PROFILE=sit|uat|prod)
+    desc: Run customer-service locally (override PROFILE=dev|uat|prod)
     deps: [mvn:install:framework]
     cmds:
       - '{{.MVN_CMD}} -f customer-service/pom.xml spring-boot:run -Dspring-boot.run.profiles={{.PROFILE}}'
 
   svc:run:rental:
-    desc: Run rental-service locally (override PROFILE=sit|uat|prod)
+    desc: Run rental-service locally (override PROFILE=dev|uat|prod)
     deps: [mvn:install:framework]
     cmds:
       - '{{.MVN_CMD}} -f rental-service/pom.xml spring-boot:run -Dspring-boot.run.profiles={{.PROFILE}}'
 
   svc:run:inventory:
-    desc: Run inventory-service locally (override PROFILE=sit|uat|prod)
+    desc: Run inventory-service locally (override PROFILE=dev|uat|prod)
     deps: [mvn:install:framework]
     cmds:
       - '{{.MVN_CMD}} -f inventory-service/pom.xml spring-boot:run -Dspring-boot.run.profiles={{.PROFILE}}'
 
   pod:build-images:
-    desc: Build all service images with explicit Dockerfile paths
+    desc: Build all service images from prebuilt jars (no per-image Maven build)
+    deps: [mvn:package:images]
     cmds:
-      - podman build -f eureka-registry/Dockerfile -t sakila/eureka-registry:local .
-      - podman build -f catalog-service/Dockerfile -t sakila/catalog-service:local .
-      - podman build -f customer-service/Dockerfile -t sakila/customer-service:local .
-      - podman build -f rental-service/Dockerfile -t sakila/rental-service:local .
-      - podman build -f inventory-service/Dockerfile -t sakila/inventory-service:local .
-      - podman build -f gateway-service/Dockerfile -t sakila/gateway-service:local .
+      - podman build -t sakila/eureka-registry:local eureka-registry
+      - podman build -t sakila/catalog-service:local catalog-service
+      - podman build -t sakila/customer-service:local customer-service
+      - podman build -t sakila/rental-service:local rental-service
+      - podman build -t sakila/inventory-service:local inventory-service
+      - podman build -t sakila/gateway-service:local gateway-service
+      # Legacy reference (root context + in-container Maven build):
+      # - podman build -f eureka-registry/Dockerfile -t sakila/eureka-registry:local .
+      # - podman build -f catalog-service/Dockerfile -t sakila/catalog-service:local .
+      # - podman build -f customer-service/Dockerfile -t sakila/customer-service:local .
+      # - podman build -f rental-service/Dockerfile -t sakila/rental-service:local .
+      # - podman build -f inventory-service/Dockerfile -t sakila/inventory-service:local .
+      # - podman build -f gateway-service/Dockerfile -t sakila/gateway-service:local .
 
   pod:up:
     desc: Build images and start the local stack without compose-time builds

@@ -1,14 +1,14 @@
 # ─── Stage 1: Build ───────────────────────────────────────────────────────────
 # Full build environment with Maven and JDK 25.
-FROM maven:3.9.11-eclipse-temurin-25 AS build
+###FROM maven:3.9.11-eclipse-temurin-25 AS build
 
-WORKDIR /workspace
+###WORKDIR /workspace
 
 # Copy complete monorepo so parent/framework modules build correctly.
-COPY . .
+###COPY . .
 
 # Build only rental-service from the root reactor; -am builds upstream modules as needed.
-RUN mvn -f pom.xml -pl rental-service -am -DskipTests clean package
+###RUN mvn -f pom.xml -pl rental-service -am -DskipTests clean package
 
 # ─── Stage 2: Runtime ─────────────────────────────────────────────────────────
 # JRE-only runtime to keep the image small and secure (no JDK tools exposed).
@@ -16,14 +16,14 @@ FROM eclipse-temurin:25-jre
 
 WORKDIR /app
 
-# Copy the self-contained Spring Boot fat-jar.
-COPY --from=build /workspace/rental-service/target/rental-service-0.0.1-SNAPSHOT.jar app.jar
+# Reuse the jar built on the host for faster image rebuilds.
+COPY target/rental-service-*.jar app.jar
 
 # --- Sensible defaults (runtime-overrideable; no secrets here) ---
 # Default server port matching application.yaml.
 ENV SERVER_PORT=8082
-# Default to SIT profile; overridden by compose or k8s for other environments.
-ENV SPRING_PROFILES_ACTIVE=sit
+# Default to DEV profile; overridden by compose or k8s for other environments.
+ENV SPRING_PROFILES_ACTIVE=dev
 # Default Eureka endpoint for standalone `docker run`; compose uses container DNS.
 ENV EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://localhost:8761/eureka/
 

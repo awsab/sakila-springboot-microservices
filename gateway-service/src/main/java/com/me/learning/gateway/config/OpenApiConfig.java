@@ -5,11 +5,13 @@ import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.servers.Server;
-import org.springdoc.core.models.GroupedOpenApi;
+
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.info.GitProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import org.springdoc.core.models.GroupedOpenApi;
 
 /**
  * Centralized OpenAPI 3.0 (Swagger) documentation for the API Gateway.
@@ -86,7 +88,6 @@ public class OpenApiConfig {
                 .group("catalog-service")
                 .displayName("Catalog Service")
                 .pathsToMatch("/catalog/**")
-                .description("Product catalog APIs: browse products, search, filter by category/price.")
                 .build();
     }
 
@@ -100,7 +101,6 @@ public class OpenApiConfig {
                 .group("customer-service")
                 .displayName("Customer Service")
                 .pathsToMatch("/customer/**")
-                .description("Customer management APIs: registration, profile, preferences, order history.")
                 .build();
     }
 
@@ -114,7 +114,6 @@ public class OpenApiConfig {
                 .group("inventory-service")
                 .displayName("Inventory Service")
                 .pathsToMatch("/inventory/**")
-                .description("Inventory tracking APIs: stock levels, reservations, warehouse management.")
                 .build();
     }
 
@@ -128,7 +127,6 @@ public class OpenApiConfig {
                 .group("rental-service")
                 .displayName("Rental Service")
                 .pathsToMatch("/rental/**")
-                .description("Rental management APIs: bookings, availability, pricing, customer agreements.")
                 .build();
     }
 
@@ -142,8 +140,12 @@ public class OpenApiConfig {
                 .group("internal-system")
                 .displayName("Internal / System")
                 .pathsToMatch("/internal/**")
-                .description("Internal system endpoints: circuit-breaker fallbacks, health checks, actuator.")
                 .build();
     }
 }
+
+
+
+
+
 

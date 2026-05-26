@@ -76,7 +76,7 @@ spring:
                     fallbackUri: forward:/internal/fallback/rental-service
 
 server:
-  port: 8080
+  port: 8085
 
 eureka:
   client:
@@ -154,4 +154,32 @@ management:
   otlp:
     tracing:
       endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
+
+# ════════════════════════════════════════════════════════════════════════════════
+# SPRINGDOC-OPENAPI CONFIGURATION
+# Centralized Swagger/OpenAPI documentation for the API gateway
+# The GroupedOpenApi beans in OpenApiConfig automatically organize routes by service.
+# ════════════════════════════════════════════════════════════════════════════════
+springdoc:
+  swagger-ui:
+    enabled: true
+    display-operation-id: true
+    url: /v3/api-docs.yaml
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    deepLinking: true
+
+  redoc:
+    enabled: true
+    url: /v3/api-docs.yaml
+
+  api-docs:
+    path: /v3/api-docs
+    groups:
+      enabled: true
+
+  show-actuator: true
+  enable-spring-security: false
+
 

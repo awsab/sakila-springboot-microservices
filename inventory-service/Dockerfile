@@ -1,14 +1,14 @@
 # ─── Stage 1: Build ───────────────────────────────────────────────────────────
 # Maven + JDK 25 build stage.
-FROM maven:3.9.11-eclipse-temurin-25 AS build
+###FROM maven:3.9.11-eclipse-temurin-25 AS build
 
-WORKDIR /workspace
+###WORKDIR /workspace
 
 # Full monorepo copy required for shared parent/framework resolution.
-COPY . .
+###COPY . .
 
 # Build only inventory-service from the root reactor; -am builds upstream modules as needed.
-RUN mvn -f pom.xml -pl inventory-service -am -DskipTests clean package
+###RUN mvn -f pom.xml -pl inventory-service -am -DskipTests clean package
 
 # ─── Stage 2: Runtime ─────────────────────────────────────────────────────────
 # Slim JRE runtime image.
@@ -17,13 +17,14 @@ FROM eclipse-temurin:25-jre
 WORKDIR /app
 
 # Copy the packaged Spring Boot fat-jar.
-COPY --from=build /workspace/inventory-service/target/inventory-service-0.0.1-SNAPSHOT.jar app.jar
+###COPY --from=build /workspace/inventory-service/target/inventory-service-0.0.1-SNAPSHOT.jar app.jar
+COPY target/inventory-service-*.jar app.jar
 
 # --- Sensible defaults (overrideable; no secrets hardcoded) ---
 # Inventory application.yaml has no port configured — 8083 matches what compose assigns.
 ENV SERVER_PORT=8083
-# Default to SIT; compose/k8s overrides for UAT/PROD.
-ENV SPRING_PROFILES_ACTIVE=sit
+# Default to DEV; compose/k8s overrides for uat/prod.
+ENV SPRING_PROFILES_ACTIVE=dev
 # Eureka URL default for bare docker run; compose overrides to container DNS name.
 ENV EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://localhost:8761/eureka/
 

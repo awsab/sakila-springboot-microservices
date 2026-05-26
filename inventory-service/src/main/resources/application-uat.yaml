@@ -1,35 +1,7 @@
 spring:
-  application:
-    name: inventory-service
-
-  flyway:
-    enabled: false
-
-server:
-  port:  8092
-
-eureka:
-  client:
-    allow-redirects: true
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-    register-with-eureka: true
-    fetch-registry: true
-  instance:
-    hostname: localhost
-    prefer-ip-address: true
-    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
-    metadata-map:
-      instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
-
----
-# ============================================================
-#  Profile: prod  (MySQL + Flyway)
-# ============================================================
-spring:
   config:
     activate:
-      on-profile: prod
+      on-profile: uat
 
   datasource:
     url: ${DB_URL}

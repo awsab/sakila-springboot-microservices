@@ -2,11 +2,8 @@ spring:
   application:
     name: inventory-service
 
-  flyway:
-    enabled: false
-
 server:
-  port:  8092
+  port: 8092
 
 eureka:
   client:
@@ -22,27 +19,7 @@ eureka:
     metadata-map:
       instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
 
----
-# ============================================================
-#  Profile: prod  (MySQL + Flyway)
-# ============================================================
-spring:
-  config:
-    activate:
-      on-profile: prod
 
-  datasource:
-    url: ${DB_URL}
-    driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
 
-  jpa:
-    database-platform: ${DB_PLATFORM:org.hibernate.dialect.MySQLDialect}
-    hibernate:
-      ddl-auto: validate
-
-  flyway:
-    enabled: true
 
 

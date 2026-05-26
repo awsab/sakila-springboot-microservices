@@ -92,6 +92,12 @@
             <version>2.16.0-alpha</version>
         </dependency>
 
+        <!-- OpenAPI / Swagger UI — WebFlux variant for reactive gateway -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+        </dependency>
+
         <!-- Testing — 'test' scope is NOT transitive. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

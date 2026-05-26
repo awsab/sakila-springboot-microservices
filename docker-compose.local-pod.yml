@@ -83,7 +83,7 @@ services:
       # Override only: Eureka endpoint must use compose container DNS name.
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-registry:8761/eureka/
       EUREKA_INSTANCE_HOSTNAME: customer-service
-      # SERVER_PORT=8081 and SPRING_PROFILES_ACTIVE=sit already set in Dockerfile.
+      # SERVER_PORT=8081 and SPRING_PROFILES_ACTIVE=dev already set in Dockerfile.
     restart: unless-stopped
     networks:
       - sakila-net

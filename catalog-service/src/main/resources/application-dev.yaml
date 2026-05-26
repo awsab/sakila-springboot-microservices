@@ -1,26 +1,19 @@
 spring:
-  application:
-    name: catalog-service
+  config:
+    activate:
+      on-profile: dev
 
   datasource:
-    url: jdbc:h2:mem:catalogdb
-    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:catalogdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=MySQL
+    driver-class-name: org.h2.Driver
     username: sa
-    password: password
+    password:
 
-server:
-  port: 8091
-eureka:
-  client:
-    allow-redirects: true
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-    register-with-eureka: true
-    fetch-registry: true
-  instance:
-    hostname: localhost
-    prefer-ip-address: true
-    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
-    metadata-map:
-      instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+
+  flyway:
+    enabled: false
 

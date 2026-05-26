@@ -1,22 +1,9 @@
-# ─── Stage 1: Build ───────────────────────────────────────────────────────────
-# Use Maven + JDK 25 to compile and package the module.
-FROM maven:3.9.11-eclipse-temurin-25 AS build
-
-WORKDIR /workspace
-
-# Copy the whole monorepo so parent and framework modules are resolvable during build.
-COPY . .
-
-# Build only gateway-service from the root reactor; -am builds upstream modules as needed.
-RUN mvn -f pom.xml -pl gateway-service -am -DskipTests clean package
-
-# ─── Stage 2: Runtime ─────────────────────────────────────────────────────────
-# Use a minimal JRE-only image for the final container (no build tool, smaller image
 FROM eclipse-temurin:25-jre
 
 WORKDIR /app
-# Copy the executable fat-jar produced by Spring Boot Maven Plugin.
-COPY --from=build /workspace/gateway-service/target/gateway-service-0.0.1-SNAPSHOT.jar app.jar
+
+# Reuse the jar built on the host for faster image rebuilds.
+COPY target/gateway-service-*.jar app.jar
 
 # --- Sensible defaults (runtime config — NOT environment-specific secrets) ---
 # These allow the image to work with a plain `docker run` without any flags.

@@ -22,7 +22,7 @@
         </parent>
 
       PROFILES
-        SIT  (default)  – full tests + JaCoCo coverage gate (80 %)
+        DEV  (default)  – full tests + JaCoCo coverage gate (80 %)
         UAT             – full tests, no coverage gate
         PROD            – tests skipped
     ====================================================================================================================
@@ -321,6 +321,13 @@
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+                <version>${springdoc-openapi.version}</version>
+            </dependency>
+
+            <!-- WebFlux variant for reactive applications (e.g., Spring Cloud Gateway) -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
                 <version>${springdoc-openapi.version}</version>
             </dependency>
 
@@ -670,7 +677,7 @@
                                 <goal>report</goal>
                             </goals>
                         </execution>
-                        <!-- Coverage gate — activated in SIT profile -->
+                        <!-- Coverage gate — activated in DEV profile -->
                     </executions>
                 </plugin>
 
@@ -1011,26 +1018,26 @@
     <!-- ══════════════════════════════════════════════════════
          BUILD PROFILES
          ─────────────────────────────────────────────────────
-         Activate with:  mvn clean verify -P SIT
+         Activate with:  mvn clean verify -P DEV
                          mvn clean verify -P UAT
                          mvn clean package -P PROD
     ══════════════════════════════════════════════════════ -->
 
     <profiles>
-        <!-- ── SIT (default) ──────────────────────────────
+        <!-- ── DEV (default) ──────────────────────────────
              • Unit tests run with full parallelism
              • Integration tests run via Failsafe
              • JaCoCo coverage gate: 80% line + 80% complexity
              • Checkstyle violations fail the build
         ─────────────────────────────────────────────────── -->
         <profile>
-            <id>SIT</id>
+            <id>DEV</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <spring.profiles.active>sit</spring.profiles.active>
-                <environment>SIT</environment>
+                <spring.profiles.active>dev</spring.profiles.active>
+                <environment>DEV</environment>
             </properties>
             <build>
                 <plugins>
@@ -1101,7 +1108,7 @@
 
         <!-- ── UAT ────────────────────────────────────────
              • Full unit + integration tests
-             • No coverage gate (gate runs in SIT)
+             • No coverage gate (gate runs in DEV)
              • Parallel test execution
         ─────────────────────────────────────────────────── -->
         <profile>
